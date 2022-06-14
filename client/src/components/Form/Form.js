@@ -1,25 +1,36 @@
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 import {TextField, Button, Typography, Paper} from "@material-ui/core";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import FileBase from "react-file-base64"
-import {createPost} from "../../store/actions/posts";
+import {createPost, updatePost} from "../../store/actions/posts";
 import useStyles from "./styles"
 
-const Form = () => {
-   const [postData, setPostData] = useState({creator: "", title: "", message: "", tags: "", selectedFile: ""})
+const Form = ({currentId, setCurrentId}) => {
+   const initialState = {creator: "", title: "", message: "", tags: "", selectedFile: ""}
+   const [postData, setPostData] = useState(initialState)
+   const post = useSelector((state) => currentId ? state.posts.data?.find((p) => p._id === currentId) : null)
+   useEffect(() => {
+      if (post) setPostData(post)
+   }, [post])
    const classes = useStyles()
    const dispatch = useDispatch()
    const handleSubmit = (e) => {
       e.preventDefault();
-      dispatch(createPost(postData))
+      if (currentId) {
+         dispatch(updatePost(currentId, postData))
+      } else {
+         dispatch(createPost(postData))
+      }
+      clear()
    }
    const clear = () => {
-
+      setCurrentId(null)
+      setPostData(initialState)
    }
    return (
       <Paper className={classes.paper}>
          <form autoComplete="off" noValidate className={`${classes.root} ${classes.form}`} onSubmit={handleSubmit}>
-            <Typography variant={"h6"}> Creating A Memory</Typography>
+            <Typography variant={"h6"}>{currentId ? "Editing" : "Creating"} A Memory</Typography>
             <TextField name={"creator"} variant={"outlined"} label={"Creator"} fullWidth value={postData.creator}
                        onChange={(e) => setPostData({...postData, creator: e.target.value})}/>
             <TextField name={"title"} variant={"outlined"} label={"Title"} fullWidth value={postData.title}
