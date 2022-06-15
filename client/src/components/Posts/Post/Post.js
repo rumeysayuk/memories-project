@@ -48,7 +48,7 @@ const Post = ({post, setCurrentId}) => {
             <Typography variant="body2" color="textSecondary" component="p">{post.message}</Typography>
          </CardContent>
          <CardActions className={classes.cardActions}>
-            <Button size="small" color="primary" onClick={likedPost}><ThumbUpAltIcon fontSize="small"/> Like {likeCount}
+            <Button size="small" color="primary" onClick={likedPost}><ThumbUpAltIcon fontSize="small"/> &nbsp; Like &nbsp; {likeCount}
             </Button>
             <Button size="small" color="primary" onClick={deletedPost}><DeleteIcon
                fontSize="small"/>Delete</Button>
