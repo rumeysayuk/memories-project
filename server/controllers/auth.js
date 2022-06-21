@@ -6,7 +6,7 @@ export const signin = async (req, res) => {
    const {email, password} = req.body
    try {
       const isExistUser = await User.findOne({email})
-      if (!email) return res.status(404).json({message: "User don't exist"})
+      if (!isExistUser) return res.status(404).json({message: "User doesn't exist"})
       const isPasswordCorrect = await bcrypt.compare(password, isExistUser.password)
       if (!isPasswordCorrect) return res.status(400).json({message: "Invalid credentials"})
 
@@ -20,15 +20,13 @@ export const signin = async (req, res) => {
 
 export const signup = async (req, res) => {
    const {email, password, firstName, lastName, confirmPassword} = req.body
+   console.log(req.body)
    try {
       const isExistUser = await User.findOne({email})
-      if (email) return res.status(400).json({message: "User already exist! "})
+      if (isExistUser) return res.status(400).json({message: "User already exist! "})
       if (password !== confirmPassword) return res.status(400).json({message: "Passwords don't match !"})
       const hashedPass = await bcrypt.hash(password, 12)
-      const result = await User.create({
-         email, password: hashedPass, firstName,
-         lastName, userName: `${firstName} ${lastName}`
-      })
+      const result = await User.create({ email, password: hashedPass, name: `${firstName} ${lastName}`})
       const token = jwt.sign({email: result.email, id: result._id}, process.env.SECRET_KEY, {expiresIn: "1h"})
       res.status(200).json({result, token})
 

@@ -3,17 +3,17 @@ import * as api from "../../api";
 
 export const signin = (formData,history) => async (dispatch) => {
    try {
-      const {data} = await api.getPosts();
+      const {data} = await api.signin();
       dispatch({type: AUTH, payload: data});
       history.push("/")
-   } catch (err) {
+   } catch (err)  {
       console.log(err.message);
    }
 };
 
 export const signup = (formData,history) => async (dispatch) => {
    try {
-      const {data} = await api.getPosts();
+      const {data} = await api.signup();
       dispatch({type: AUTH, payload: data});
       history.push("/")
    } catch (err) {
