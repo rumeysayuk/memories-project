@@ -30,10 +30,12 @@ const Auth = () => {
       e.preventDefault()
       setFormData({...formData, [e.target.name]: e.target.value})
    }
+
    const googleFailure = (err) => {
       console.log(err)
       console.log("Google sign in unsuccessfully.Try Again")
    }
+
    const googleSuccess = (res) => {
       const googleData = res.profileObj
       const token = res.tokenId
@@ -45,9 +47,10 @@ const Auth = () => {
          console.log(err)
       }
    }
+
    const switchMode = () => {
       setIsSignup((prevIsSignup) => !prevIsSignup)
-      handleShowPassword(false)
+      setShowPassword(false)
    }
 
    const handleShowPassword = () => setShowPassword((prevShowPass) => !prevShowPass)
@@ -62,7 +65,7 @@ const Auth = () => {
                <Grid container spacing={2}>
                   {isSignup && (
                      <>
-                          <Input name="firstName" label={"First Name"} handleChange={handleChange} autoFocus half/>
+                        <Input name="firstName" label={"First Name"} handleChange={handleChange} autoFocus half/>
                         <Input name="lastName" label={"Last Name"} handleChange={handleChange} half/>
                      </>
                   )}

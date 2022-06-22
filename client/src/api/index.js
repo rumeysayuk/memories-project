@@ -1,17 +1,23 @@
 import axios from 'axios';
 
-const url = process.env.REACT_APP_BASE_API_URI;
+const API = axios.create({baseURL: process.env.REACT_APP_BASE_API_URI})
 
-export const getPosts = () => axios.get(`${url}/posts`);
+API.interceptors.request.use((req) => {
+   if (localStorage.getItem("profile")) {
+      req.headers.Authorization = `Bearer ${JSON.parse(localStorage.getItem("profile")).token}`
+   }
+   return req
+})
+export const getPosts = () => API.get(`/posts`);
 
-export const createPost = (newPost) => axios.post(`${url}/posts`, newPost)
+export const createPost = (newPost) => API.post("/posts", newPost)
 
-export const updatePost = (id, updatedPost) => axios.patch(`${url}/posts/${id}`, updatedPost)
+export const updatePost = (id, updatedPost) => API.patch(`/posts/${id}`, updatedPost)
 
-export const deletePost =(id) => axios.delete(`${url}/posts/${id}`)
+export const deletePost = (id) => API.delete(`/posts/${id}`)
 
-export const likePost = (id) => axios.patch(`${url}/posts/${id}/like-post`)
+export const likePost = (id) => API.patch(`/posts/${id}/like-post`)
 
-export const signin =(formData) => axios.post(`${url}/auth/signin`,formData)
+export const signin = (formData) => API.post(`/auth/signin`, formData)
 
-export const signup =(formData) => axios.post(`${url}/auth/signup`,formData)
+export const signup = (formData) => API.post(`/auth/signup`, formData)
