@@ -4,24 +4,25 @@ import {useDispatch, useSelector} from "react-redux";
 import FileBase from "react-file-base64"
 import {createPost, updatePost} from "../../store/actions/posts";
 import useStyles from "./styles"
+import {useHistory} from "react-router-dom";
 
 const Form = ({currentId, setCurrentId}) => {
    const initialState = {title: "", message: "", tags: "", selectedFile: ""}
    const [postData, setPostData] = useState(initialState)
    const user = JSON.parse(localStorage.getItem("profile"))
-   const post = useSelector((state) => currentId ? state.posts.data?.find((p) => p._id === currentId) : null)
-
+   const post = useSelector((state) => currentId ? state.posts.posts?.find((p) => p._id === currentId) : null)
    useEffect(() => {
       if (post) setPostData(post)
    }, [post])
    const classes = useStyles()
    const dispatch = useDispatch()
+   const history=useHistory()
    const handleSubmit = (e) => {
       e.preventDefault();
       if (currentId) {
          dispatch(updatePost(currentId, {...postData, name: user?.result?.name}))
       } else {
-         dispatch(createPost({...postData, name: user?.result?.name}))
+         dispatch(createPost({...postData, name: user?.result?.name},history))
       }
       clear()
    }

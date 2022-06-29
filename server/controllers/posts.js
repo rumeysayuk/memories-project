@@ -28,9 +28,11 @@ export const getPosts = async (req, res) => {
 export const getPostsBySearch = async (req, res) => {
    const {searchQuery, tags} = req.query;
    try {
-      const title = new RegExp(searchQuery, "i");
-      const posts = await Posts.find({$or: [{title}, {tags: {$in: tags.split(',')}}]});
-      res.json({data: posts});
+      const filter = {$or: []}
+      if (!!searchQuery) filter.$or.push({title: new RegExp(searchQuery, "i")})
+      if (tags?.length > 0) filter.$or.push({tags: {$in: tags.split(',')}})
+      const posts = await Posts.find(filter.$or?.length > 0 ? filter : {});
+      return res.json({data: posts});
    } catch (error) {
       res.status(404).json({message: error.message});
    }
@@ -79,6 +81,19 @@ export const likePost = async (req, res) => {
    } else {
       post.likes = post.likes.filter((id) => id !== String(req.userId))
    }
+   const updatedPost = await Posts.findByIdAndUpdate(id, post, {new: true})
+
+   res.status(200).json(updatedPost)
+}
+
+export const commentPost = async (req, res) => {
+   const {id} = req.params
+   const {value} = req.body
+
+   const post = await Posts.findById(id)
+   
+   post.comments.push(value)
+
    const updatedPost = await Posts.findByIdAndUpdate(id, post, {new: true})
 
    res.status(200).json(updatedPost)

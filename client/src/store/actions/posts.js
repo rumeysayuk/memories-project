@@ -6,7 +6,7 @@ import {
    POST_LIKE,
    GET_BY_SEARCH,
    START_LOADING,
-   END_LOADING, GET_POST
+   END_LOADING, GET_POST, COMMENT
 } from '../../constants/actionTypes';
 import * as api from "../../api"
 
@@ -32,26 +32,43 @@ export const getPost = (id) => async (dispatch) => {
    }
 };
 
-export const createPost = (post) => async (dispatch) => {
+export const createPost = (post, history) => async (dispatch) => {
    try {
       dispatch({type: START_LOADING});
       const {data} = await api.createPost(post)
-      dispatch({type: CREATE, payload: data})
+      history.push(`/posts/${data.data._id}`);
+      dispatch({type: CREATE, payload: data.data})
    } catch (err) {
       console.log(err.message)
    }
 }
+
+export const commentPost = (value, id) => async (dispatch) => {
+   try {
+      const {data} = await api.comment(value, id)
+      dispatch({type: COMMENT, payload: data});
+
+      return data.comments
+   } catch (err) {
+      console.log(err.message)
+   }
+}
+
 export const getPostsBySearch = (searchQuery) => async (dispatch) => {
    try {
       dispatch({type: START_LOADING});
-      const {data: {data}} = await api.getPostsBySearch(searchQuery);
-
-      dispatch({type: GET_BY_SEARCH, payload: {data}});
-      dispatch({type: END_LOADING});
+      await api.getPostsBySearch(searchQuery).then(({data: {data}}) => {
+         dispatch({type: GET_BY_SEARCH, payload: {data}});
+         dispatch({type: END_LOADING});
+      }).catch(err => {
+         dispatch({type: END_LOADING});
+         console.log(err?.response?.data?.message)
+      })
    } catch (error) {
       console.log(error);
    }
 };
+
 export const updatePost = (id, post) => async (dispatch) => {
    try {
       const {data} = await api.updatePost(id, post);
@@ -62,8 +79,9 @@ export const updatePost = (id, post) => async (dispatch) => {
 };
 
 export const likePost = (id) => async (dispatch) => {
+   const user = JSON.parse(localStorage.getItem("profile"))
    try {
-      const {data} = await api.likePost(id)
+      const {data} = await api.likePost(id, user?.token)
       dispatch({type: POST_LIKE, payload: data});
    } catch (err) {
       console.log(err.message)
